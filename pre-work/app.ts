@@ -35,7 +35,7 @@ interface IPoligonResponse {
 }
 
 const fetchData = async () => {
-    const resp = await fetch('https://poligon.aidevs.pl/dane.txt', );
+    const resp = await fetch(process.env.PRE_WORK_API);
 
     if (!resp.ok) {
         throw new Error(`Response status: ${resp.status}`);
@@ -45,7 +45,7 @@ const fetchData = async () => {
 }
 
 const postAnswer = async (request: IPoligonRequest): Promise<IPoligonResponse> => {
-    const rawResponse = await fetch('https://xyz.ag3nts.org/', {
+    const rawResponse = await fetch(process.env.XYZ_API, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
