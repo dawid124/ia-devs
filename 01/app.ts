@@ -1,4 +1,4 @@
-import OpenAIService from "./OpenAIService";
+import OpenAIService from "../service/OpenAIService";
 import OpenAI from "openai";
 import {ChatCompletionMessageParam} from "openai/resources/chat/completions";
 

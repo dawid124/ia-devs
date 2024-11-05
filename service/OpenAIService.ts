@@ -2,6 +2,13 @@ import OpenAI from "openai";
 require('dotenv').config({ path: '../.env' })
 import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 
+export enum EModel {
+  gpt4 = 'gpt-4',
+  gpt4o = 'gpt-4o',
+  gpt4oMini = 'gpt-4o-mini',
+  gpt35turbo = 'gpt-3.5-turbo',
+}
+
 class OpenAIService {
   private openai: OpenAI;
 

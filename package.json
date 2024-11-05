@@ -9,7 +9,9 @@
     "tsx": "^4.17.0"
   },
   "scripts": {
-    "pre-work": "bun run pre-work/app.ts"
+    "pre-work": "bun run pre-work/app.ts",
+    "01": "bun run 01/app.ts",
+    "02": "bun run 02/app.ts"
   },
   "peerDependencies": {
     "typescript": "^5.6.2"
