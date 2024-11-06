@@ -15,7 +15,7 @@ export type openAiResponseType = Shared.ResponseFormatText
     | Shared.ResponseFormatJSONSchema;
 
 class OpenAIService {
-  private openai: OpenAI;
+  private readonly openai: OpenAI;
 
   constructor() {
     this.openai = new OpenAI();

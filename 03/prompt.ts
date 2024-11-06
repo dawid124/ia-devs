@@ -1,28 +1,36 @@
-import {ResponseFormatJSONSchema} from "openai/src/resources/shared";
 import OpenAIService, {EModel, openAiResponseType} from "../service/OpenAIService";
-import OpenAI from "openai";
 import {ChatCompletionMessageParam} from "openai/resources/chat/completions";
+import {IAnswerList, IQuestionList} from "./types";
+import OpenAI from "openai";
 
-export interface IAnswer {
-    number: number,
-    answer: string;
+const a1: IAnswerList = {
+    answers: [
+        {
+            number: 0,
+            answer: "1918"
+        },
+        {
+            number: 1,
+            answer: "blue"
+        }
+    ]
 }
 
-export interface IAnswerList {
-    answers: IAnswer[]
+const q1: IQuestionList = {
+    questions: [
+        {
+            number: 0,
+            question: "the year of Poland regaining independence"
+        },
+        {
+            number: 1,
+            question: "what is color of the sea?"
+        }
+    ]
 }
 
-export interface IQuestionList {
-    questions: IQuestion[]
-}
-
-export interface IQuestion {
-    number: number,
-    question: string;
-}
-
-export const outputFormat: ResponseFormatJSONSchema = {
-    type: 'json_schema',
+export const outputFormat = {
+    type: 'json_schema' as const,
     json_schema: {
         name: 'answers',
         strict: true,
@@ -35,10 +43,10 @@ export const outputFormat: ResponseFormatJSONSchema = {
                         type: "object",
                         properties: {
                             number: {
-                                "type": "number"
+                                type: "number"
                             },
                             answer: {
-                                "type": "string"
+                                type: "string"
                             }
                         },
                         required: ["number", "answer"],
@@ -50,7 +58,7 @@ export const outputFormat: ResponseFormatJSONSchema = {
             additionalProperties: false
         }
     }
-}
+} as const;
 
 export const askAI = async (text: string, model: EModel, output: openAiResponseType) => {
     return await OpenAIService.completion([
@@ -59,43 +67,18 @@ export const askAI = async (text: string, model: EModel, output: openAiResponseT
     ], model, false, output) as OpenAI.Chat.Completions.ChatCompletion;
 }
 
-const a1: IAnswerList = {
-    answers: [
-        {
-            number: 0,
-            answer: "918"
-        },
-        {
-            number: 1,
-            answer: "blue"
-        }
-    ]
-}
-const q1: IQuestionList = {
-    questions: [
-        {
-            number: 0,
-            question: "the year of Poland regaining independence"
-        },
-        {
-            number: 1,
-            question: "what is color of the see?"
-        }
-    ]
-}
 const createSystemPrompt = (): ChatCompletionMessageParam => {
     return {
         role: "system",
-        content: `You answer on question, simple, you give the simplest shortest answer
+        content: `You answer questions simply and provide the shortest possible answer
         
         <rules>
-        - You always answer in english in JSON format
+        - Always answer in English in JSON format
         </rules>
         
         <snippet_examples>
         USER: ${JSON.stringify(q1)}
         AI: ${JSON.stringify(a1)}
-
         </snippet_examples>
         `
     };

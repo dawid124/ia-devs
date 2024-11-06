@@ -1,93 +1,60 @@
-import {EModel} from "../service/OpenAIService";
-import CentralService from "../service/CentralService";
-import {askAI, IAnswerList, IQuestionList, outputFormat} from "./prompt";
+import { EModel } from '../service/OpenAIService';
+import CentralService from '../service/central/CentralService';
+import { IRequest, IAnswerList } from './types';
+import { JsonService } from './services/JsonService';
+import { askAI, outputFormat } from './prompt';
+import { Request, Response } from 'express';
 
-const express = require('express')
-require('dotenv').config({ path: '../.env' })
+const express = require('express');
+require('dotenv').config({ path: '../.env' });
 
-const app = express()
-const port = 3000
+const app = express();
+const port = 3000;
 
-interface IRequest {
-    apikey: string;
-    description: string;
-    copyright: string;
-    'test-data': ITestData[];
-}
+const getAiResponses = async (questions: string): Promise<IAnswerList> => {
+    const response = await askAI(questions, EModel.gpt4oMini, outputFormat);
+    // const response = await askAI(questions, EModel.gpt4oMini, {type: 'json_object'});
+    if (!response.choices) {
+        throw new Error('Unexpected response format from AI');
+    }
+    return JSON.parse(response.choices[0].message.content!);
+};
 
-interface ITestData {
-    question: string;
-    answer: number;
-    test: ITest;
-}
-
-interface ITest {
-    q: string;
-    a: string;
-    n?: number;
-}
-
-app.get('/', async (req, res) => {
+app.get('/', async (req: Request, res: Response) => {
     try {
-        let data = await CentralService.data<IRequest>('json.txt');
-        console.log(`Data from central: `);
-        console.log(data);
+        if (!process.env.AI_DEVS_KEY) {
+            throw new Error('AI_DEVS_KEY is not defined');
+        }
 
-        let testData = data["test-data"];
-        fixCalculation(testData);
+        const data = await CentralService.data<IRequest>('json.txt');
+        console.log('Data from central:', data);
 
-        const questionForAi = getQuestions(testData);
+        const questions = JsonService.prepareData(data['test-data']);
+        const aiAnswers = await getAiResponses(questions);
+        console.log('AI answer:', aiAnswers);
 
-        // const assistantResponse = await askAI(questionForAi, EModel.gpt4oMini, {type: "json_object"});
-        const assistantResponse = await askAI(questionForAi, EModel.gpt4oMini, outputFormat);
-        // const assistantResponse = await askAI(questionForAi, EModel.gpt4o, {type: "json_object"});
-        // const assistantResponse = await askAI(questionForAi, EModel.gpt4o, outputFormat);
-        //
-        const aiAnswers: IAnswerList = JSON.parse(assistantResponse.choices[0].message.content);
-        console.log(`AI answer: `);
-        console.log(aiAnswers);
+        if (!aiAnswers) {
+            console.error('Answer from AI is not defined');
+            res.send('Answer from AI is not defined');
+            return;
+        }
 
-        testData.filter(data => data.test).forEach(data => {
-            data.test.a = aiAnswers.answers.find(i => i.number == data.test.n).answer;
-            delete data.test.n;
+        JsonService.updateTestDataWithAnswers(data['test-data'], aiAnswers);
+
+        data.apikey = process.env.AI_DEVS_KEY;
+        const response = await CentralService.report({
+            task: 'JSON',
+            apikey: process.env.AI_DEVS_KEY,
+            answer: data,
         });
 
-        data.apikey = process.env.AI_DEVS_KEY
-        const response = await CentralService.report({task: 'JSON', apikey: process.env.AI_DEVS_KEY, answer: data})
-
-        res.send(response)
+        res.send(response);
     } catch (err) {
-        console.log(err);
-        res.send(err)
+        console.error(err);
+        res.status(500).send(err);
     }
-})
-
-const fixCalculation = (list: ITestData[]) => {
-    list.forEach(data => {
-        const calculatedAnswer = eval(data.question);
-        if (calculatedAnswer !== data.answer) {
-            console.log(`wrong calculation for: ${data.question}, wrong answer: ${data.answer}, correct: ${calculatedAnswer}`);
-            data.answer = calculatedAnswer;
-        }
-    })
-}
-
-const getQuestions = (list: ITestData[]) => {
-    let questions: ITest[] = list.filter(data => data.test).map(data => data.test);
-
-    const obj: IQuestionList = {
-        questions: []
-    }
-    for (let i = 0; i < questions.length; i++) {
-        questions[i].n = i;
-        obj.questions.push({number: i, question: questions[i].q});
-    }
-
-    console.log(obj);
-    return JSON.stringify(obj);
-}
-
+});
 
 app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
-})
+    console.log(`Example app listening on port ${port}`);
+});

@@ -2,14 +2,14 @@ import OpenAIService, {EModel} from "../service/OpenAIService";
 import OpenAI from "openai";
 import {ChatCompletionMessageParam} from "openai/resources/chat/completions";
 import XyzService, {IVerifyRequest} from "../service/XyzService";
-
+import { Request, Response } from 'express';
 const express = require('express')
 require('dotenv').config({ path: '../.env' })
 
 const app = express()
 const port = 3000
 
-app.get('/', async (req, res) => {
+app.get('/', async (req: Request, res: Response) => {
     try {
         let resp = await XyzService.verify({msgID: '0', text: 'READY'});
         console.log(`XYZ Verify Question: ${resp.text}`);
@@ -20,7 +20,13 @@ app.get('/', async (req, res) => {
 
         console.log(`AI answer: ${assistantResponse.choices[0].message.content}`);
 
-        resp = await XyzService.verify({msgID: resp.msgID, text: assistantResponse.choices[0].message.content});
+        if (!assistantResponse.choices) {
+            console.error('Answer from AI is not defined');
+            res.send('Answer from AI is not defined');
+            return;
+        }
+
+        resp = await XyzService.verify({msgID: resp.msgID, text: assistantResponse.choices[0].message.content as string});
 
         console.log(resp);
         res.send(resp)

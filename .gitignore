@@ -9,3 +9,5 @@ database/
 package-lock.json
 bun.lockb
 nocommit
+dist/
+*.log
