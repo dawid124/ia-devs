@@ -2,8 +2,8 @@ import OpenAIService, {EModel} from "../service/OpenAIService";
 import OpenAI from "openai";
 import {ChatCompletionMessageParam} from "openai/resources/chat/completions";
 import XyzService, {IVerifyRequest} from "../service/XyzService";
-import express from "express";
 
+const express = require('express')
 require('dotenv').config({ path: '../.env' })
 
 const app = express()
@@ -29,6 +29,7 @@ app.get('/', async (req, res) => {
         res.send(err)
     }
 })
+
 
 const askAI = async (resp: IVerifyRequest, model: EModel) => {
     return await OpenAIService.completion([

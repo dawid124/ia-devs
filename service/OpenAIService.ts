@@ -1,6 +1,7 @@
 import OpenAI from "openai";
 require('dotenv').config({ path: '../.env' })
 import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
+import * as Shared from "openai/src/resources/shared";
 
 export enum EModel {
   gpt4 = 'gpt-4',
@@ -8,6 +9,10 @@ export enum EModel {
   gpt4oMini = 'gpt-4o-mini',
   gpt35turbo = 'gpt-3.5-turbo',
 }
+
+export type openAiResponseType = Shared.ResponseFormatText
+    | Shared.ResponseFormatJSONObject
+    | Shared.ResponseFormatJSONSchema;
 
 class OpenAIService {
   private openai: OpenAI;
@@ -19,13 +24,15 @@ class OpenAIService {
   async completion(
     messages: ChatCompletionMessageParam[],
     model: string = "gpt-4",
-    stream: boolean = false
+    stream: boolean = false,
+    responseType: openAiResponseType = {type: 'text'},
   ): Promise<OpenAI.Chat.Completions.ChatCompletion | AsyncIterable<OpenAI.Chat.Completions.ChatCompletionChunk>> {
     try {
       const chatCompletion = await this.openai.chat.completions.create({
         messages,
         model,
         stream,
+        response_format: responseType,
       });
 
       if (stream) {
