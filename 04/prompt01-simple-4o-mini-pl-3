@@ -1,0 +1,21 @@
+Znajdź najkrótszą trasę na mapie
+
+Celem jest znalezienie najkrótszej trasy od punktu początkowego do końcowego, unikając przeszkód (ścian) i poruszając się krok po kroku.
+
+<rules>
+- Unikaj przeszkód (ścian) podczas obliczania trasy i nigdy na nie nie wchodź.
+- Nie przeskakuj ścian na mapie.
+- Dostępne ruchy to: "UP" (x, y+1), "DOWN" (x, y-1), "LEWO" (x-1, y), "RIGHT" (x+1, y).
+- numerowanie zaczyna się od wartości 1
+- jeśli musisz się wrócić zapisuj kierunek powrotu 
+- punkt (1,1) znajduje się w lewym dolnym rogu mapy
+- Wynik przedstaw w formacie JSON jako <RESULT> { "steps": "directions1, direction2 ..." } </RESULT>.
+- użyj algorytmu znajdowania najkrótszej trasy
+</rules>
+
+
+PLEASE GO TO FINISH POINT:
+map_size=(6,4)
+start_point=(1,1)
+finish_point=(6,1)
+wall=(2,1),(2,2),(2,4),(4,2),(4,3)

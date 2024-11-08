@@ -1,0 +1,138 @@
+Znajdź najkrótszą trasę na mapie
+
+Celem jest znalezienie najkrótszej trasy od punktu początkowego do końcowego, unikając przeszkód (ścian) i poruszając się krok po kroku.
+
+<rules>
+- Unikaj przeszkód (ścian) podczas obliczania trasy i nigdy na nie nie wchodź.
+- Nie przeskakuj ścian na mapie.
+- Dostępne ruchy to: "UP" (x, y+1), "DOWN" (x, y-1), "LEWO" (x-1, y), "RIGHT" (x+1, y).
+- numerowanie zaczyna się od wartości 1
+- nie wracaj się na poprzednie pozycje
+- punkt (1,1) znajduje się w lewym dolnym rogu mapy
+- Wynik przedstaw w formacie JSON jako <RESULT> { "steps": "directions1, direction2 ..." } </RESULT>.
+- Śledź aktualną pozycję i analizuj możliwość ruchu w różnych kierunkach podczas obliczeń.
+- Uwzględniaj cały proces podejmowania decyzji na każdym kroku w odpowiedzi (np. krok 1, krok 2, itd.).
+</rules>
+
+<examples>
+
+USER:
+map_size=(6,4)
+start_point=(1,1)
+finish_point=(6,4)
+wall=(2,1),(2,2),(2,3),(4,2),(4,3),(4,4)
+
+ASSISTANT:
+krok1:
+jestem w punkcie (1,1)
+punkt końcowy jest w (6,4)
+najlepiej iść w prawo (2,1) lub w górę (1,2)
+w punkcie (2,1) jest ściana
+idę w górę
+(1,1) -> (1,2) = UP
+
+krok2:
+jestem w punkcie (1,2)
+punkt końcowy jest w (6,4)
+najlepiej iść w prawo (2,2) lub w górę (1,3)
+w punkcie (2,2) jest ściana
+idę w górę
+(1,2) -> (1,3) = UP
+
+krok3:
+jestem w punkcie (1,3)
+punkt końcowy jest w (6,4)
+najlepiej iść w prawo (2,3) lub w górę (1,4)
+w punkcie (2,3) jest ściana
+idę w górę
+(1,3) -> (1,4) = UP
+
+krok4:
+jestem w punkcie (1,4)
+punkt końcowy jest w (6,4)
+najlepiej iść w prawo (2,4)
+w punkcie (2,4) nie ma ściany
+idę w prawo
+(1,4) -> (2,4) = RIGHT
+
+krok5:
+jestem w punkcie (2,4)
+punkt końcowy jest w (6,4)
+najlepiej iść w prawo (3,4)
+w punkcie (3,4) nie ma ściany
+idę w prawo
+(2,4) -> (3,4) = RIGHT
+
+krok6:
+jestem w punkcie (3,4)
+punkt końcowy jest w (6,4)
+najlepiej iść w prawo (4,4)
+w punkcie (4,4) jest ściana
+idę w dół (3,3)
+(3,4) -> (3,3) = DOWN
+
+krok7:
+jestem w punkcie (3,3)
+punkt końcowy jest w (6,4)
+najlepiej iść w dół (3,2) lub w prawo (4,3)
+w punkcie (4,3) jest ściana
+idę w dół
+(3,3) -> (3,2) = DOWN
+
+krok8:
+jestem w punkcie (3,2)
+punkt końcowy jest w (6,4)
+najlepiej iść w dół (3,1) lub w prawo (3,3)
+w punkcie (3,3) jest ściana
+idę w dół
+(3,2) -> (3,1) = DOWN
+
+krok9:
+jestem w punkcie (3,1)
+punkt końcowy jest w (6,4)
+idę w prawo (4,1)
+ponieważ w (4,1) nie ma ściany
+idę z (3,1) -> (4,1) = RIGHT
+
+krok10:
+jestem w punkcie (4,1)
+punkt końcowy jest w (6,4)
+najlepiej iść w prawo (5,1)
+ponieważ w (5,1) nie ma ściany
+idę z (4,1) -> (5,1) = RIGHT
+
+krok11:
+jestem w punkcie (5,1)
+punkt końcowy jest w (6,4)
+idę w prawo (6,1)
+ponieważ w (6,1) nie ma ściany
+idę z (5,1) -> (6,1) = RIGHT
+
+krok12:
+jestem w punkcie (6,1)
+punkt końcowy jest w (6,4)
+idę w górę (6,2)
+ponieważ w (6,2) nie ma ściany
+idę z (6,1) -> (6,2) = UP
+
+krok13:
+jestem w punkcie (6,2)
+punkt końcowy jest w (6,4)
+idę w górę (6,3)
+ponieważ w (6,3) nie ma ściany
+idę z (6,2) -> (6,3) = UP
+
+krok14:
+jestem w punkcie (6,3)
+punkt końcowy jest w (6,4)
+idę w górę (6,4)
+ponieważ w (6,4) to punkt końcowy.
+idę z (6,3) -> (6,4) = UP
+
+</examples>
+
+PLEASE GO TO FINISH POINT:
+map_size=(6,4)
+start_point=(1,1)
+finish_point=(6,1)
+wall=(2,1),(2,2),(2,4),(4,2),(4,3)
